@@ -1,0 +1,23 @@
+{
+    "name": "panoscape/access",
+    "description": "Role and Permission control for Laravel",
+    "homepage": "https://github.com/panoscape/access",
+    "keywords": [
+      "laravel", "permission", "role"  
+    ],
+    "require": {
+        "illuminate/support": "^5.3"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sean",
+            "email": "theoxuanx@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Panoscape\\Access\\": "src/"
+        }
+    }
+}
