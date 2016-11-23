@@ -51,8 +51,8 @@ trait HasRoles
      */
     public function hasRoles($roles, $requireAll = true, $column = 'name')
     {
-        if(!is_array($roles)) {
-            $roles = [$roles];
+        if(is_string($roles)) {
+            $roles = preg_split('/[\|\s]+/', $roles, 0, PREG_SPLIT_NO_EMPTY);
         }
         $count = $this->roles()->whereIn($column, $roles)->count();
         if($requireAll) {
@@ -72,8 +72,8 @@ trait HasRoles
      */
     public function hasPermissions($permissions, $requireAll = true, $column = 'name')
     {
-        if(!is_array($permissions)) {
-            $permissions = [$permissions];
+        if(is_string($permissions)) {
+            $permissions = preg_split('/[\|\s]+/', $permissions, 0, PREG_SPLIT_NO_EMPTY);
         }
         $count = $this->permissions()->whereIn("access_permissions.$column", $permissions)->count();
         if($requireAll) {

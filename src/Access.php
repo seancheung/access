@@ -15,15 +15,15 @@ class Access
      */
     public function hasRoles($roles, $requireAll = true, $column = 'name')
     {
+        if(auth()->guest() || !in_array(HasRoles::class, class_uses(auth()->user()))) {
+            return false;
+        }
+
         if(is_string($roles)) {
             $roles = preg_split('/[\|\s]+/', $roles, 0, PREG_SPLIT_NO_EMPTY);
         }
         if(is_string($requireAll)) {
             $requireAll = $requireAll == 'true';
-        }
-
-        if(auth()->guest() || !in_array(HasRoles::class, class_uses(auth()->user()))) {
-            return false;
         }
 
         return auth()->user()->hasRoles($roles, $requireAll, $column);
@@ -40,6 +40,10 @@ class Access
      */
     public function hasPermissions($permissions, $requireAll = true, $column = 'name')
     {
+        if(auth()->guest() || !in_array(HasRoles::class, class_uses(auth()->user()))) {
+            return false;
+        }
+
         if(is_string($permissions)) {
             $permissions = preg_split('/[\|\s]+/', $permissions, 0, PREG_SPLIT_NO_EMPTY);
         }
@@ -47,10 +51,6 @@ class Access
             $requireAll = $requireAll == 'true';
         }
 
-        if(auth()->guest() || !in_array(HasRoles::class, class_uses(auth()->user()))) {
-            return false;
-        }
-
-        return auth()->user()->hasPermissions($roles, $requireAll, $column);
+        return auth()->user()->hasPermissions($permissions, $requireAll, $column);
     }
 }
