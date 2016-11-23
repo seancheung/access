@@ -139,7 +139,7 @@ $role->hasPermissions('edit_users');
 $user->attachRoles('admin');
 //by id
 $user->attachRoles(1);
-by model instance
+//by model instance
 $user->attachRoles($role);
 //with array
 $user->attachRoles(['admin', 'editor']);
