@@ -19,5 +19,17 @@
         "psr-4": {
             "Panoscape\\Access\\": "src/"
         }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^3.3",
+        "phpunit/phpunit": "~5.0"
+    },
+    "autoload-dev": {
+      "psr-4": {
+          "Panoscape\\Access\\Tests\\": "tests/"
+      }  
+    },
+    "scripts": {
+        "test": "phpunit"
     }
 }

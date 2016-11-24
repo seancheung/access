@@ -12,6 +12,11 @@ trait HasRoles
     public static function bootHasRoles()
     {
         Role::$userModel = static::class;
+        static::deleting(function($user) {
+            if(!in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses($user)) || $user->isForceDeleting()) {
+                $user->roles()->detach([]);
+            }
+        });
     }
 
     /**
@@ -51,14 +56,7 @@ trait HasRoles
      */
     public function hasRoles($roles, $requireAll = true, $column = 'name')
     {
-        if(!is_array($roles)) {
-            $roles = [$roles];
-        }
-        $count = $this->roles()->whereIn($column, $roles)->count();
-        if($requireAll) {
-            return $count >= count($roles);
-        }
-        return $count > 0;
+        return Facades\Access::hasRoles($roles, $requireAll, $column, $this);
     }
 
     /**
@@ -72,14 +70,7 @@ trait HasRoles
      */
     public function hasPermissions($permissions, $requireAll = true, $column = 'name')
     {
-        if(!is_array($permissions)) {
-            $permissions = [$permissions];
-        }
-        $count = $this->permissions()->whereIn("access_permissions.$column", $permissions)->count();
-        if($requireAll) {
-            return $count >= count($permissions);
-        }
-        return $count > 0;
+        return Facades\Access::hasPermissions($permissions, $requireAll, $column, $this);
     }
 
     /**
@@ -92,23 +83,7 @@ trait HasRoles
      */
     public function attachRoles($roles, $column = 'name')
     {        
-        if(is_array($roles)) {
-            foreach($roles as $key=>$role) {
-                $this->attachRoles($role, $column);
-            }
-        }
-        elseif($roles instanceof Role) {
-            $this->roles()->attach($roles->id);
-        }
-        elseif(is_integer($roles)) {
-            $this->roles()->attach($roles);
-        }
-        elseif(is_string($roles)) {
-            $this->roles()->attach(Role::where($column, $roles)->firstOrFail()->id);
-        }
-        else {
-            throw new \Exception("Key must be array|integer|string|\Panoscape\Access\Role");
-        }
+        Facades\Access::attachRoles($roles, $column, $this);
     }
 
     /**
@@ -121,36 +96,7 @@ trait HasRoles
      */
     public function detachRoles($roles, $column = 'name')
     {        
-        if(is_array($roles)) {
-            $array = [];
-            foreach($roles as $key=>$role) {
-                if($role instanceof Role) {
-                    array_push($array, $role->id);
-                }
-                elseif(is_integer($role)) {
-                    array_push($array, $role);
-                }
-                elseif(is_string($role)) {
-                    array_push($array, Role::where($column, $role)->firstOrFail()->id);
-                }
-                else {
-                    throw new \Exception("Key must be integer|string|\Panoscape\Access\Role");
-                }
-            }
-            $this->roles()->detach($array);
-        }
-        elseif($roles instanceof Role) {
-            $this->roles()->detach($roles->id);
-        }
-        elseif(is_integer($roles)) {
-            $this->roles()->detach($roles);
-        }
-        elseif(is_string($roles)) {
-            $this->roles()->detach(Role::where($column, $roles)->firstOrFail()->id);
-        }
-        else {
-            throw new \Exception("Key must be array|integer|string|\Panoscape\Access\Role");
-        }
+        Facades\Access::detachRoles($roles, $column, $this);
     }
 
     /**
@@ -164,41 +110,6 @@ trait HasRoles
      */
     public function syncRoles($roles, $detaching = true, $column = 'name')
     { 
-        $array = [];       
-        if(is_array($roles)) {            
-            foreach($roles as $key=>$role) {
-                if($role instanceof Role) {
-                    array_push($array, $role->id);
-                }
-                elseif(is_integer($role)) {
-                    array_push($array, $role);
-                }
-                elseif(is_string($role)) {
-                    array_push($array, Role::where($column, $role)->firstOrFail()->id);
-                }
-                else {
-                    throw new \Exception("Key must be integer|string|\Panoscape\Access\Role");
-                }
-            }            
-        }
-        elseif($roles instanceof Role) {
-            array_push($array, $roles->id);
-        }
-        elseif(is_integer($roles)) {
-            array_push($array, $roles);
-        }
-        elseif(is_string($roles)) {
-            array_push($array, Role::where($column, $roles)->firstOrFail()->id);
-        }
-        else {
-            throw new \Exception("Key must be array|integer|string|\Panoscape\Access\Role");
-        }
-
-        if($detaching) {
-            $this->roles()->sync($array);
-        }
-        else {
-            $this->roles()->syncWithoutDetaching($array);
-        }
+        Facades\Access::syncRoles($roles, $detaching, $column, $this);
     }
 }

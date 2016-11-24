@@ -41,6 +41,15 @@ class Role extends Model
      */
     public static $userModel = '\App\User';
 
+
+    public static function boot()
+    {
+        parent::boot();
+        static::deleting(function($role) {
+            $role->permissions()->detach([]);
+        });
+    }
+
     /**
      * The permissions that belong to the role
      *
@@ -72,11 +81,7 @@ class Role extends Model
      */
     public function hasPermissions($permissions, $requireAll = true, $column = 'name')
     {
-        $count = $this->permissions()->whereIn($column, $permissions)->count();
-        if($requireAll) {
-            return $count >= count($permissions);
-        }
-        return $count > 0;
+        return Facades\Access::hasPermissions($permissions, $requireAll, $column, $this);
     }
 
     /**
@@ -89,23 +94,7 @@ class Role extends Model
      */
     public function attachPermissions($permissions, $column = 'name')
     {        
-        if(is_array($permissions)) {
-            foreach($permissions as $key=>$permission) {
-                $this->attachPermissions($permission, $column);
-            }
-        }
-        elseif($permissions instanceof Permission) {
-            $this->permissions()->attach($permissions->id);
-        }
-        elseif(is_integer($permissions)) {
-            $this->permissions()->attach($permissions);
-        }
-        elseif(is_string($permissions)) {
-            $this->permissions()->attach(Permission::where($column, $permissions)->firstOrFail()->id);
-        }
-        else {
-            throw new \Exception("Key must be array|integer|string|\Panoscape\Access\Permission");
-        }
+        Facades\Access::attachPermissions($this, $permissions, $column);
     }
 
     /**
@@ -118,36 +107,7 @@ class Role extends Model
      */
     public function detachPermissions($permissions, $column = 'name')
     {        
-        if(is_array($permissions)) {
-            $array = [];
-            foreach($permissions as $key=>$permission) {
-                if($permission instanceof Permission) {
-                    array_push($array, $permission->id);
-                }
-                elseif(is_integer($permission)) {
-                    array_push($array, $permission);
-                }
-                elseif(is_string($permission)) {
-                    array_push($array, Permission::where($column, $permission)->firstOrFail()->id);
-                }
-                else {
-                    throw new \Exception("Key must be integer|string|\Panoscape\Access\Permission");
-                }
-            }
-            $this->permissions()->detach($array);
-        }
-        elseif($permissions instanceof Permission) {
-            $this->permissions()->detach($permissions->id);
-        }
-        elseif(is_integer($permissions)) {
-            $this->permissions()->detach($permissions);
-        }
-        elseif(is_string($permissions)) {
-            $this->permissions()->detach(Permission::where($column, $permissions)->firstOrFail()->id);
-        }
-        else {
-            throw new \Exception("Key must be array|integer|string|\Panoscape\Access\Permission");
-        }
+        Facades\Access::detachPermissions($this, $permissions, $column);
     }
 
     /**
@@ -161,41 +121,6 @@ class Role extends Model
      */
     public function syncPermissions($permissions, $detaching = true, $column = 'name')
     { 
-        $array = [];       
-        if(is_array($permissions)) {            
-            foreach($permissions as $key=>$permission) {
-                if($permission instanceof Permission) {
-                    array_push($array, $permission->id);
-                }
-                elseif(is_integer($permission)) {
-                    array_push($array, $permission);
-                }
-                elseif(is_string($permission)) {
-                    array_push($array, Permission::where($column, $permission)->firstOrFail()->id);
-                }
-                else {
-                    throw new \Exception("Key must be integer|string|\Panoscape\Access\Permission");
-                }
-            }            
-        }
-        elseif($permissions instanceof Permission) {
-            array_push($array, $permissions->id);
-        }
-        elseif(is_integer($permissions)) {
-            array_push($array, $permissions);
-        }
-        elseif(is_string($permissions)) {
-            array_push($array, Permission::where($column, $permissions)->firstOrFail()->id);
-        }
-        else {
-            throw new \Exception("Key must be array|integer|string|\Panoscape\Access\Permission");
-        }
-
-        if($detaching) {
-            $this->permissions()->sync($array);
-        }
-        else {
-            $this->permissions()->syncWithoutDetaching($array);
-        }
+        Facades\Access::syncPermissions($this, $permissions, $detaching, $column);
     }
 } 
