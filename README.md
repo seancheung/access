@@ -57,7 +57,7 @@ protected $routeMiddleware = [
 ### Migration
 
 ```shell
-php artisan vendor:publish --provider="Panoscape\Access\AccessServiceProvider" --tag="migrations"
+php artisan vendor:publish --provider="Panoscape\Access\AccessServiceProvider" --tag=migrations
 ```
 
 Before migrating, you'll need to modify the `users` table in the published migration file to the correct user table used in your application
@@ -172,19 +172,31 @@ $role->syncPermissions('editor_users');
 //check the current authenticated user's roles and permissions
 Access::hasRoles('admin');
 Access::hasPermissions('edit_users');
+
+//check the given user's roles and permissions
+Access::hasRoles('admin', true, 'name', $user);
+Access::hasPermissions('edit_users', true, 'name', $user);
+
+//attach roles to current authenticated user
+Access::attachRoles('admin');
+Access::attachRoles(['admin', 'editor']);
+
+//attach roles to the given user
+Access::attachRoles('admin', 'name', $user);
+Access::attachRoles(['admin', 'editor'], 'name', $user);
 ```
 
 ### Middleware
 
 ```php
 //role
-Route::get('/dashboard', 'DashboardController@index')->middleware('access:role,admin');
+Route::get('/dashboard', 'DashboardController@index')->middleware('access:roles,admin');
 //permission
-Route::get('/dashboard', 'DashboardController@index')->middleware('access:permission,edit_users');
+Route::get('/dashboard', 'DashboardController@index')->middleware('access:permissions,edit_users');
 //multiple
-Route::get('/dashboard', 'DashboardController@index')->middleware('access:permission,edit_users|manage_sites');
+Route::get('/dashboard', 'DashboardController@index')->middleware('access:permissions,edit_users|manage_sites');
 //requirement and column
-Route::get('/dashboard', 'DashboardController@index')->middleware('access:permission,1|3,false,id');
+Route::get('/dashboard', 'DashboardController@index')->middleware('access:permissions,1|3,false,id');
 ```
 
 ### Blade
@@ -202,16 +214,51 @@ Route::get('/dashboard', 'DashboardController@index')->middleware('access:permis
 <div>
 @endpermissions
 
-<-- Multiple arguments should be passed in as array -->
-@roles(['admin|editor|root', false])
+@roles('admin|editor|root', false)
 <div>
     ...
 <div>
 @endroles
 
-@permissions(['1|2|3', false, 'id'])
+@permissions('1|2|3', false, 'id')
 <div>
     ...
 <div>
 @endpermissions
 ```
+
+## Testing
+
+```shell
+composer test
+```
+
+or
+
+```shell
+vendor/bin/phpunit
+```
+
+
+## Change Log
+
+### [1.0.1] - 2016-11-24
+#### Added
+- attach/detach/sync roles and permissions in Facades
+- Facades now accept specific user rather than always using `auth()->user()`
+- detaching roles when deleting users
+- detaching permissions when deleting roles
+- unit test
+
+#### Changed
+- renamed `access` middleware's first argument to plural format: `role` to `roles`, `permission` to `permissions`
+- multiple arguments in blade directives no longer need to be wrapped in an array
+
+#### Fixed
+- `roles` and `permissions` blade directives failure issue
+
+### [1.0.0] - 2016-11-22
+#### First release
+
+[1.0.1]: https://github.com/panoscape/access/compare/1.0.0...1.0.1
+[1.0.0]: https://github.com/panoscape/access/releases/tag/1.0.0

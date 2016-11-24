@@ -21,8 +21,8 @@ class VerifyAccess
      */
     public function handle($request, Closure $next, $type, $access, $requireAll = true, $column = 'name')
     {
-        if($type == 'role' && Access::hasRoles($access, $requireAll, $column) ||
-            $type == 'permission' && Access::hasPermissions($access, $requireAll, $column)) {
+        if($type == 'roles' && Access::hasRoles($access, $requireAll, $column) ||
+            $type == 'permissions' && Access::hasPermissions($access, $requireAll, $column)) {
                 return $next($request);
             }
         abort(403);
