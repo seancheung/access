@@ -1,7 +1,7 @@
 {
     "name": "panoscape/access",
     "description": "Role and Permission control for Laravel",
-    "homepage": "https://github.com/panoscape/access",
+    "homepage": "https://github.com/seancheung/access",
     "keywords": [
       "laravel", "permission", "role"  
     ],
