@@ -6,3 +6,6 @@ php:
 before_script:
  - composer install -n
 script: composer test
+branches:
+ only:
+  - master
