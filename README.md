@@ -1,3 +1,10 @@
+<p align="center">
+<a href="https://travis-ci.org/seancheung/access"><img src="https://travis-ci.org/seancheung/access.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/panoscape/access"><img src="https://poser.pugx.org/panoscape/access/d/total.svg" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/panoscape/access"><img src="https://poser.pugx.org/panoscape/access/v/stable.svg" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/panoscape/access"><img src="https://poser.pugx.org/panoscape/access/license.svg" alt="License"></a>
+</p>
+
 # Access
 Role and Permission control for Laravel
 
